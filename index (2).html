@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spam Scanner — Deep Learning Email Spam Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">◆</span> <strong>SPAM</strong>/SCAN</div>
+    <div id="statusPill" class="pill" data-state="checking"><span class="dot"></span><span id="statusText">checking model…</span></div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <p class="eyebrow">Bi-LSTM · Deep Learning Classifier</p>
+      <h1>Drop in a message.<br>We’ll tell you if it’s trying to fool you.</h1>
+      <p class="lede">Paste raw email or SMS content below. The model reads it the way it was trained to — cleaned, tokenized, and scored token-by-token — then returns a spam probability.</p>
+    </section>
+
+    <section class="card">
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tabSingle" role="tab" aria-selected="true" data-tab="single">Single message</button>
+        <button class="tab" id="tabBatch" role="tab" aria-selected="false" data-tab="batch">Batch scan</button>
+      </div>
+
+      <!-- Single message -->
+      <div id="panelSingle" class="panel">
+        <div class="editor">
+          <div class="editor-head"><span class="mono">message.txt</span><span class="mono muted" id="charCount">0 characters</span></div>
+          <textarea id="messageInput" rows="8" spellcheck="false" placeholder="Subject: You've won a free prize!!!&#10;&#10;Click the link below to claim your reward before it expires..."></textarea>
+          <div class="editor-foot">
+            <button id="scanBtn" class="btn primary">Scan message</button>
+            <button id="clearBtn" class="btn ghost">Clear</button>
+            <span class="spacer"></span>
+            <button id="sampleSpam" class="btn link" type="button">Try a spam sample</button>
+            <button id="sampleHam" class="btn link" type="button">Try a normal message</button>
+          </div>
+        </div>
+
+        <div id="error" class="alert" role="alert" hidden></div>
+
+        <div id="result" class="result" hidden aria-live="polite">
+          <div class="result-top">
+            <span id="verdictBadge" class="badge">—</span>
+            <span id="percent" class="percent">0%</span>
+          </div>
+          <div class="meter" aria-hidden="true">
+            <div id="meterFill" class="meter-fill"></div>
+            <div id="meterMarker" class="meter-marker"></div>
+          </div>
+          <div class="meter-scale mono muted"><span>0% safe</span><span id="markerLabel">threshold 50%</span><span>100% spam</span></div>
+          <p id="explain" class="explain"></p>
+        </div>
+      </div>
+
+      <!-- Batch -->
+      <div id="panelBatch" class="panel" hidden>
+        <div class="editor">
+          <div class="editor-head"><span class="mono">batch.txt</span><span class="mono muted" id="batchCount">0 messages</span></div>
+          <textarea id="batchInput" rows="8" spellcheck="false" placeholder="Enter one message per line.&#10;You can also load a .txt or .csv file below."></textarea>
+          <div class="editor-foot">
+            <button id="batchBtn" class="btn primary">Scan batch</button>
+            <button id="batchClear" class="btn ghost">Clear</button>
+            <label class="btn ghost file-btn">Load file<input id="fileInput" type="file" accept=".txt,.csv,text/plain,text/csv" hidden></label>
+            <span class="spacer"></span>
+            <button id="batchExport" class="btn link" type="button" disabled>Export results CSV</button>
+          </div>
+        </div>
+        <div id="batchError" class="alert" role="alert" hidden></div>
+        <div id="batchSummary" class="chips" hidden></div>
+        <div id="batchTableWrap" class="table-wrap" hidden>
+          <table class="table">
+            <thead><tr><th>#</th><th>Message</th><th>Spam probability</th><th>Verdict</th></tr></thead>
+            <tbody id="batchBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Threshold -->
+      <div class="threshold">
+        <label for="threshold">Spam threshold</label>
+        <input id="threshold" type="range" min="5" max="95" step="1" value="50">
+        <output id="thresholdValue" class="mono">0.50</output>
+        <span class="muted small">Messages at or above this probability are marked Spam; the 20 points below it are Borderline.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>Scan history</h2>
+        <div class="actions">
+          <button id="historyExport" class="btn ghost small-btn">Export CSV</button>
+          <button id="historyClear" class="btn ghost small-btn">Clear history</button>
+        </div>
+      </div>
+      <p class="muted small">Stored only in this browser (local storage). Nothing is uploaded anywhere except to the local scanner at this address.</p>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Time</th><th>Message</th><th>Probability</th><th>Verdict</th></tr></thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+        <p id="historyEmpty" class="empty">No scans yet — results will appear here.</p>
+      </div>
+    </section>
+
+    <footer class="footer muted small">An Efficient Deep Learning-Based Email Spam Classification Model · Bi-LSTM · Flask</footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
